@@ -18,7 +18,7 @@ function submit(e) {
 function addTask(task) {
     let ul = document.querySelector('ul');
     let item = document.createElement('li');
-    item.innerHTML = `<span class="delete">×</span><input type="checkbox"><label>${task}</label>`;
+    item.innerHTML = `<label>${task}</label><span class="delete">×</span>`;
     ul.appendChild(item);
     document.querySelector('.tasksBoard').style.display = 'block';
 }
@@ -31,7 +31,6 @@ function deleteOrTick(e) {
     if (e.target.className == 'delete') {
         deleteTask(e);
     } else {
-        if (e.target.nodeName === 'INPUT')
         tickTask(e);
     }
 }
@@ -41,13 +40,12 @@ function deleteTask(event) {
 }
 
 function tickTask(event) {
-    const checkbox = event.target;
-    const task = checkbox.nextSibling;
-    if (checkbox.checked) {
-        task.style.textDecoration = 'line-through';
-        task.style.color = "#ff0000";
-    } else {
+    const task = event.target;
+    if (task.style.textDecoration === 'line-through') {
         task.style.textDecoration = 'none';        
         task.style.color = "#2f4f4f";
+    } else {
+        task.style.textDecoration = 'line-through';
+        task.style.color = "#ff0000";
     }
 }
