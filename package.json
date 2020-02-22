@@ -1,0 +1,17 @@
+{
+  "name": "todo-vanilla",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jsdom": "16.2.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "^7.0.1",
+    "mocha-jsdom": "^2.0.0"
+  }
+}
