@@ -1,14 +1,6 @@
-const jsdom = require('mocha-jsdom');
 const assert = require('assert');
 
 describe('Store', function() {
-    jsdom({
-        url: 'http://dev.com'
-    })
-    before(function() {
-        require('../store.js')
-    })
-
     describe('#findAll()', function() {
         it('should return empty list when there is no todos', function() {
             const store = new window.app.Store('todos')
@@ -17,28 +9,48 @@ describe('Store', function() {
         });
     });
 
-    describe('#add()', function() {
-        after(function() {
+    describe('#save()', function() {
+        afterEach(function() {
             window.localStorage.clear();
         })
     
         it('should add 2 entries on todo list', function() {
             const store = new window.app.Store('todos')
-            store.add({
-                id: 'abc1',
+            store.save({
                 description: 'todo-1',
                 completed: false,
             });
     
-            store.add({
-                id: 'abc2',
+            store.save({
                 description: 'todo-2',
                 completed: false,
             })
     
             const result = store.findAll();
             assert.equal(result.length, 2);
-        })
+        });
+
+        it('should update 1 entry on todo list', function() {
+            const store = new window.app.Store('todos')
+            const first = store.save({
+                description: 'todo-1',
+                completed: false,
+            });
+    
+            const second = store.save({
+                description: 'todo-2',
+                completed: false,
+            });
+
+            store.save({
+                id: second.id,
+                description: 'todo-2',
+                completed: true,
+            });
+
+            const found = store.findAll().filter((todo) => todo.id === second.id)[0];
+            assert.equal(found.completed, true);
+        });
     });
 
     describe('#remove()', function() {
@@ -48,20 +60,19 @@ describe('Store', function() {
     
         it('should remove item matching id', function() {
             const store = new window.app.Store('todos')
-            store.add({
-                id: 'abc1',
+            let first = store.save({
                 description: 'todo-1',
                 completed: false,
             });
     
-            store.add({
-                id: 'abc2',
+            let second = store.save({
                 description: 'todo-2',
                 completed: false,
             })
 
             assert.equal(store.findAll().length, 2);
-            store.remove('abc1');
+            store.remove(first.id);
+            assert.notEqual(first.id, second.id);
             assert.equal(store.findAll().length, 1);
         })
     })

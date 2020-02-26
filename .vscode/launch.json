@@ -10,7 +10,8 @@
               "--timeout",
               "999999",
               "--colors",
-              "${workspaceFolder}/test"
+              "${workspaceFolder}/test",
+              "--recursive"
           ],
           "console": "integratedTerminal",
           "internalConsoleOptions": "neverOpen"
@@ -24,7 +25,8 @@
               "--timeout",
               "999999",
               "--colors",
-              "${file}"
+              "${file}",
+              "--recursive"
           ],
           "console": "integratedTerminal",
           "internalConsoleOptions": "neverOpen"
