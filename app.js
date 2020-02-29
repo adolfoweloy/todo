@@ -1,5 +1,7 @@
 (function(window) {
-    const Todo = function() { }
+    const Todo = function(model) { 
+        this.model = model;
+    }
     
     Todo.prototype.loadEvents = function() {
         $on(qs('form'), 'submit', (e) => this._submit(e));
@@ -17,41 +19,65 @@
     };
 
     Todo.prototype._addTask = function(task) {
-        let ul = qs('ul');
-        let item = document.createElement('li');
-        item.innerHTML = `<label>${task}</label><span class="delete">×</span>`;
-        ul.appendChild(item);
-        qs('.tasksBoard').style.display = 'block';
+        this.model.create(task, function(todo) {
+            // all view
+            let ul = qs('ul');
+            let item = document.createElement('li');
+            item.setAttribute('id', todo.id);
+            item.innerHTML = `<label>${todo.description}</label><span class="delete">×</span>`;
+            ul.appendChild(item);
+            qs('.tasksBoard').style.display = 'block';
+        });
     };
-        
+
     Todo.prototype._clearList = function() {
-        qs('ul').innerHTML = '';
+        this.model.clear(function() {
+            qs('ul').innerHTML = '';
+        });
     };
         
-    Todo.prototype._deleteOrTick = function(e) {
-        if (e.target.className == 'delete') {
-            this._deleteTask(e);
+    Todo.prototype._deleteOrTick = function(event) {
+        const element = event.target.parentElement;
+        const id = element.getAttribute('id');
+        if (event.target.className == 'delete') {
+            this._deleteTask(id, event);
         } else {
-            this._tickTask(e);
-        }
-    };
-        
-    Todo.prototype._deleteTask = function(event) {
-        event.target.parentElement.remove();
-    };
-        
-    Todo.prototype._tickTask = function(event) {
-        const task = event.target;
-        if (task.style.textDecoration === 'line-through') {
-            task.style.textDecoration = 'none';        
-            task.style.color = "#2f4f4f";
-        } else {
-            task.style.textDecoration = 'line-through';
-            task.style.color = "#ff0000";
+            this._tickTask(id, event);
         }
     };
 
-    window.app = window.app || new Todo();
-    $on(window, 'load', window.app.loadEvents());
+    Todo.prototype._deleteTask = function(id, event) {
+        this.model.remove(id, function() {
+            event.target.parentElement.remove();
+        });
+    };
+
+    Todo.prototype._tickTask = function(id, event) {
+        const that = this;
+        that.model.find(id, function(todo) {
+            const task = event.target;
+
+            // this code still looks terrible!
+            if (todo.completed) {
+                todo.completed = false;
+                that.model.update(todo, function() {
+                    task.style.textDecoration = 'none';        
+                    task.style.color = "#2f4f4f";
+                });
+            } else {
+                todo.completed = true;
+                that.model.update(todo, function() {
+                    task.style.textDecoration = 'line-through';
+                    task.style.color = "#ff0000";
+                });
+            }
+        });
+    };
+
+    const model = new window.app.Model(new window.app.Store('todo'));
+
+    window.app = window.app || {};
+    window.app.todo = new Todo(model);
+    window.app.todo.loadEvents();
 
 })(window);

@@ -75,5 +75,28 @@ describe('Store', function() {
             assert.notEqual(first.id, second.id);
             assert.equal(store.findAll().length, 1);
         })
+    });
+
+    describe('#clear()', function() {
+        after(function() {
+            window.localStorage.clear();
+        })
+
+        it('should clear all items', function() {
+            const store = new window.app.Store('todos')
+            store.save({
+                description: 'todo-1',
+                completed: false,
+            });
+    
+            store.save({
+                description: 'todo-2',
+                completed: false,
+            });
+
+            assert.equal(store.findAll().length, 2);
+            store.clear();
+            assert.equal(store.findAll().length, 0);
+        });
     })
 });
