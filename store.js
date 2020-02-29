@@ -3,10 +3,8 @@
 
     function Store(name) {
         this._dbName = name;
-        if (!localStorage.getItem(name)) {
-            let todos = {items: []};
-            localStorage.setItem(name, JSON.stringify(todos));
-        }
+        let todos = {items: []};
+        localStorage.setItem(name, JSON.stringify(todos));
     };
 
     Store.prototype.findAll = function() {
@@ -41,6 +39,13 @@
             JSON.stringify({ 
                 items: todos.items.filter((item) => item.id !== id) 
             })
+        );
+    };
+
+    Store.prototype.clear = function() {
+        localStorage.setItem(
+            this._dbName,
+            JSON.stringify({items: []})
         );
     };
 
