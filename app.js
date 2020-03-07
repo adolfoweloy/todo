@@ -1,6 +1,7 @@
 (function(window) {
-    const Todo = function(model) { 
+    const Todo = function(model, view) { 
         this.model = model;
+        this.view = view;
     }
     
     Todo.prototype.loadEvents = function() {
@@ -11,7 +12,7 @@
 
     Todo.prototype._submit = function(e) {
         e.preventDefault();
-        let input = qs('input');
+        const input = qs('input');
         if (input.value != '') {
             this._addTask(input.value);
             input.value = '';
@@ -19,14 +20,9 @@
     };
 
     Todo.prototype._addTask = function(task) {
+        const that = this;
         this.model.create(task, function(todo) {
-            // all view
-            let ul = qs('ul');
-            let item = document.createElement('li');
-            item.dataset['id'] = todo.id;
-            item.innerHTML = `<label>${todo.description}</label><span class="delete">×</span>`;
-            ul.appendChild(item);
-            qs('.tasksBoard').style.display = 'block';
+            that.view.renderItem(todo);
         });
     };
 
@@ -77,9 +73,10 @@
     };
 
     const model = new window.app.Model(new window.app.Store('todo'));
+    const view = new window.app.View();
 
     window.app = window.app || {};
-    window.app.todo = new Todo(model);
+    window.app.todo = new Todo(model, view);
     window.app.todo.loadEvents();
 
 })(window);

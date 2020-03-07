@@ -51,14 +51,15 @@ html{
     width: 50px;
   
   }
+
   .tasksBoard{
     background-color: #fff;
     margin-top: 20px;
     padding-top: 10px;
     padding-bottom: 10px;
     padding-right: 40px;
-    display: none;
   }
+  
   ul{
     list-style: none;
   }
