@@ -18,25 +18,31 @@
         callback.call(null, todo);
     };
 
-    Model.prototype.find = function(_id, _callback) {
+    Model.prototype.find = function(_id, _callback, _not_found_callback) {
         const id = _id || undefined; // thrown an exception or provide an error callback?
         const callback = _callback || function() {};
+        const callbackNotFound = _not_found_callback || function() {};
 
         // what should happen when the item can't be found?
         const todo = this.store
             .findAll()
             .filter(todo => todo.id === _id)[0]; // this doesn't sound safe
         
-        callback.call(null, todo);
+        if (todo) {
+            callback.call(null, todo);
+        } else {
+            callbackNotFound.call(null, id);
+        }
     };
 
-    Model.prototype.update = function(_todo, _callback) {
+    Model.prototype.toggle = function(_todo, _callback) {
         if (!_todo) {
             throw 'Todo must be an object';
         }
         const todo = _todo;
         const callback = _callback || function() {};
 
+        todo.completed = !todo.completed;
         const newTodo = this.store.save(todo);
 
         callback.call(null, newTodo);
