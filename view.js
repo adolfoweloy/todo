@@ -32,7 +32,7 @@
         let ul = qs('ul');
         let item = document.createElement('li');
         item.dataset['id'] = todo.id;
-        item.innerHTML = `<label>${todo.description}</label><span class="delete">×</span>`;
+        item.innerHTML = `<label>${todo.description}</label><button class="delete"></button>`;
         ul.appendChild(item);
     };
 
