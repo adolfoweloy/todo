@@ -5,34 +5,39 @@
     }
     
     Todo.prototype.loadEvents = function() {
-        $on(qs('form'), 'submit', (e) => this._submit(e));
-        $on(qs('#clear'), 'click', () => this._clearList());
-        $on(qs('ul'), 'click', (e) => this._deleteOrTick(e));
-    };
+        const self = this;
 
-    Todo.prototype._submit = function(e) {
-        e.preventDefault();
-        const input = qs('input');
-        if (input.value != '') {
-            this._addTask(input.value);
-            input.value = '';
-        }
-    };
+        self.view.bind('newItem', function(description, clearStateCallback) {
+            self.newItem(description, clearStateCallback);
+        });
 
-    Todo.prototype._addTask = function(task) {
-        const that = this;
-        this.model.create(task, function(todo) {
-            that.view.renderItem(todo);
+        self.view.bind('clear', function() {
+            self.clearList();
+        });
+
+        self.view.bind('deleteOrTick', function() {
+            self.deleteOrTick(event);
         });
     };
 
-    Todo.prototype._clearList = function() {
-        this.model.clear(function() {
-            qs('ul').innerHTML = '';
+    Todo.prototype.newItem = function(description, clearStateCallback) {
+        const self = this;
+        if (description != '') {
+            self.model.create(description, function(todo) {
+                self.view.addItem(todo);
+                clearStateCallback.call(null);
+            });
+        }
+    };
+    
+    Todo.prototype.clearList = function() {
+        const self = this;
+        self.model.clear(function() {
+            self.view.clearAll();
         });
     };
         
-    Todo.prototype._deleteOrTick = function(event) {
+    Todo.prototype.deleteOrTick = function(event) {
         const element = event.target.parentElement;
         if (!(element instanceof HTMLLIElement)) return;
 
