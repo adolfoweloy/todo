@@ -15,17 +15,22 @@
             self.clearList();
         });
 
-        self.view.bind('deleteOrTick', function() {
-            self.deleteOrTick(event);
+        self.view.bind('tick', function(id, event) {
+            self.tickTask(id, event);
         });
     };
 
     Todo.prototype.newItem = function(description, clearStateCallback) {
         const self = this;
         if (description != '') {
+            // callback hell! :D
             self.model.create(description, function(todo) {
-                self.view.addItem(todo);
-                clearStateCallback.call(null);
+                self.view.addItem(todo, function(newItem) {
+                    self.view.bind('delete', function(id) {
+                        self.deleteTask(id);
+                    }, newItem);
+                    clearStateCallback.call(null);
+                });
             });
         }
     };
@@ -37,44 +42,25 @@
         });
     };
         
-    Todo.prototype.deleteOrTick = function(event) {
-        const element = event.target.parentElement;
-        if (!(element instanceof HTMLLIElement)) return;
-
-        const id = element.dataset.id;
-        if (event.target.className == 'delete') {
-            this._deleteTask(id, event);
-        } else {
-            this._tickTask(id, event);
-        }
-    };
-
-    Todo.prototype._deleteTask = function(id, event) {
-        this.model.remove(id, function() {
-            event.target.parentElement.remove();
+    Todo.prototype.deleteTask = function(id) {
+        const self = this;
+        self.model.remove(id, function() {
+            self.view.remove(id);
         });
     };
 
-    Todo.prototype._tickTask = function(id, event) {
-        const that = this;
-        that.model.find(id, function(todo) {
-            const task = event.target;
-
-            // this code still looks terrible!
-            if (todo.completed) {
-                todo.completed = false;
-                that.model.update(todo, function() {
-                    task.style.textDecoration = 'none';        
-                    task.style.color = "#2f4f4f";
+    Todo.prototype.tickTask = function(id, event) {
+        const self = this;
+        self.model.find(id, 
+            function(todo) { // success
+                self.model.toggle(todo, function(newTodo) {
+                    self.view.completed(newTodo);
                 });
-            } else {
-                todo.completed = true;
-                that.model.update(todo, function() {
-                    task.style.textDecoration = 'line-through';
-                    task.style.color = "#ff0000";
-                });
+            },
+            function(id) { // todo not found
+                console.log(`${id} not found`);
             }
-        });
+        );
     };
 
     const model = new window.app.Model(new window.app.Store('todo'));
