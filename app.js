@@ -23,7 +23,7 @@
             // all view
             let ul = qs('ul');
             let item = document.createElement('li');
-            item.setAttribute('id', todo.id);
+            item.dataset['id'] = todo.id;
             item.innerHTML = `<label>${todo.description}</label><span class="delete">×</span>`;
             ul.appendChild(item);
             qs('.tasksBoard').style.display = 'block';
@@ -38,7 +38,9 @@
         
     Todo.prototype._deleteOrTick = function(event) {
         const element = event.target.parentElement;
-        const id = element.getAttribute('id');
+        if (!(element instanceof HTMLLIElement)) return;
+
+        const id = element.dataset.id;
         if (event.target.className == 'delete') {
             this._deleteTask(id, event);
         } else {
