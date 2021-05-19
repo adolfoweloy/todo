@@ -1,5 +1,8 @@
 # TODO
-As a simple way to practice JS and walk through the things I find important to know from vanilla JS to ReactJS, I've created this project that will be my log while I move a simple TODO project from 1 JS file to modularised, with tests and ReactJS.
+I created this project as part of my journey to catch up on javascript, and modern front-end technologies.
+The plan is to not use ReactJS or any other advanced tools for this project, but to improve with at most with old tools and technologies such as:
+- RequireJS
+- Backbone
 
 ## Running the tests
 ```
